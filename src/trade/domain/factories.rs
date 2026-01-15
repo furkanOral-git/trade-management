@@ -5,18 +5,22 @@ use rumt::{emit_event, prelude::RuntimeEvent};
 use crate::{
     shared::{
         event::SessionCreatedEvent,
-        ids::SessionId,
-        objects::{CommonDateTime, Unit},
+        ids::{PositionId, SessionId},
+        objects::{Amount, CommonDateTime, PriceLevel, Unit},
         states::{OpenClosedState, Persisted, Unpersisted},
     },
-    trade::domain::{TradeSession, entity::SessionAsset, states::TradePositionPersistable},
+    trade::domain::{
+        TradeSession,
+        entity::{SessionAsset, TradeLog},
+        objects::{PositionType, TradeAction, TradeType},
+        states::TradePositionPersistable,
+    },
 };
 
 pub(crate) struct TradeSessionFactory;
 
 impl TradeSessionFactory {
-    
-    pub(crate) async fn create_new(
+    pub(crate) fn create_new(
         name: impl Into<String>,
         white_list: impl Into<Vec<SessionAsset>>,
         capital: Unit,
@@ -33,15 +37,6 @@ impl TradeSessionFactory {
             white_list: white_list.into(),
             _state: PhantomData,
         };
-        let event_arg = SessionCreatedEvent {
-            id: session.id.clone(),
-            name: session.name.clone(),
-            capital: session.capital.clone(),
-        };
-        let event = RuntimeEvent::Static {
-            event_name: "Session.Created".into(),
-        };
-        emit_event(event, event_arg).await;
         session
     }
     pub(crate) fn from_db(
@@ -68,11 +63,25 @@ impl TradeSessionFactory {
     }
 }
 pub(crate) struct TradeLogFactory;
-impl TradeLogFactory{
-
+impl TradeLogFactory {
+    pub(crate) fn new_unbounded(
+        session_id: SessionId,
+        action: TradeAction,
+        at_level: PriceLevel,
+        amount: Amount,
+    ) -> TradeLog<Unpersisted> {
+        todo!()
+    }
+    pub(crate) fn new_bounded(
+        position_id: PositionId,
+        session_id: SessionId,
+        action: TradeAction,
+        at_level: PriceLevel,
+        amount: Amount,
+    ) -> TradeLog<Unpersisted> {
+        todo!()
+    }
 }
 
 pub(crate) struct TradePositionFactory;
-impl TradePositionFactory{
-
-}
+impl TradePositionFactory {}

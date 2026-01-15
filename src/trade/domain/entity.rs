@@ -11,6 +11,7 @@ use crate::{
 
 pub(crate) struct TradeLog<State: Persistency> {
     position_id: PositionId,
+    session_id : SessionId,
     trade_type: TradeType,
     action: TradeAction,
     level: PriceLevel,

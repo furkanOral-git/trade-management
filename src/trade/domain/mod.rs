@@ -12,7 +12,7 @@ use crate::{
         states::{OpenClosedState, Persisted, Persistency, Unpersisted}, traits::DomainError,
     },
     trade::domain::{
-        entity::{ClosedTradePosition, SessionAsset, TradeLog, TradePosition}, errors::TradeSessionDomainErrors, objects::{PositionType, TradeType}, states::TradePositionPersistable
+        entity::{ClosedTradePosition, SessionAsset, TradeLog, TradePosition}, errors::{TradePositionDomainError, TradeSessionDomainError}, factories::{TradeLogFactory, TradeSessionFactory}, objects::{PositionType, TradeType}, states::TradePositionPersistable
     },
 };
 
@@ -35,6 +35,23 @@ pub(crate) struct TradeSession<State: Persistency> {
 }
 
 impl<State: Persistency> TradeSession<State> {
+    
+    pub(crate) async fn open_new_session(name : &str,list : Vec<SessionAsset>,capital : Unit)->TradeSession<Unpersisted>{
+        
+        let session = TradeSessionFactory::create_new(name, list, capital);
+        
+        let event_arg = SessionCreatedEvent {
+            name: session.name.clone(),
+            capital: session.capital.clone(),
+            date_time : session.open_time.clone(),
+        };
+        let event = RuntimeEvent::Static {
+            event_name: "Session.Created".into(),
+        };
+        emit_event(event, event_arg).await;
+        session
+
+    }
     // Aggregate'in methodları içerisine yalnızca VO'lar gelebilir. Entity'ler parametre olarak gelemez.
     // Çünkü Application katmanının sınırları ihlal edilmiş olur. Application sadece uygulama katındaki loglama, cachleme, repo, exception handling gibi
     // ya da dış servislerin implementasyonu için kullanılır. Application yalnızca AR ya da Birden fazla AR'ı bir arada çalıştıran Domain Service kullanabilir.
@@ -45,26 +62,30 @@ impl<State: Persistency> TradeSession<State> {
         direction : PositionType,
         at_level : PriceLevel,
         stop_level: PriceLevel,
-        risk : Unit
+        risk : Unit,
 
-    ) -> Result<TradeSession<Unpersisted>,TradeSessionDomainErrors> {
+    ) -> Result<TradePosition<Unpersisted>,TradeSessionDomainError> {
+        
         if self.state == OpenClosedState::Closed{
-            let err = TradeSessionDomainErrors::ClosedTradeSessionCanNotOpenPosition;
+            let err = TradeSessionDomainError::ClosedTradeSessionCanNotOpenPosition;
             return Err(err)
         }
+        let log = TradeLogFactory::new_unbounded(self.id);
         todo!()
 
     }
     pub(crate) fn close_position(
         &mut self,
-        posiiton_id: PositionId,
+        position_id: PositionId,
         at_level : PriceLevel,
-    ) -> TradeSession<Unpersisted> {
+    ) -> Result<TradeSession<Unpersisted>,TradePositionDomainError> {
         todo!()
     }
     pub(crate) fn close_position_partial(
         &mut self,
-        log: TradeLog<Unpersisted>,
+        position_id : PositionId,
+        at_level : PriceLevel,
+        amount : Amount,
     ) -> TradeSession<Unpersisted> {
         todo!()
     }

@@ -1,12 +1,12 @@
 use crate::shared::{
-    ids::{PositionId, SessionId},
-    objects::Unit,
+    ids::PositionId,
+    objects::{CommonDateTime, Unit},
 };
 #[derive(Debug)]
 pub(crate) struct SessionCreatedEvent {
-    pub(crate) id: SessionId,
     pub(crate) name: String,
     pub(crate) capital: Unit,
+    pub(crate) date_time : CommonDateTime,
 }
 pub(crate) struct PositionClosedEvent {
     pub(crate) id: PositionId,

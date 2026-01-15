@@ -14,14 +14,17 @@ pub struct Unit {
     value: f32,
     unit_type: UnitType,
 }
-impl Unit{
-    pub(crate) fn new(unit_type : &UnitType,value : f32)->Self{
-        Unit { value, unit_type: unit_type.clone() }
+impl Unit {
+    pub(crate) fn new(unit_type: &UnitType, value: f32) -> Self {
+        Unit {
+            value,
+            unit_type: unit_type.clone(),
+        }
     }
-    pub(crate) fn value(&self)->&f32{
+    pub(crate) fn value(&self) -> &f32 {
         &self.value
     }
-    pub(crate) fn unit_type(&self)->&UnitType{
+    pub(crate) fn unit_type(&self) -> &UnitType {
         &self.unit_type
     }
 }
@@ -65,13 +68,23 @@ impl Unit {
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct PriceLevel {
     value: f32,
+    value_type_as_unit : UnitType
 }
 impl PriceLevel {
     pub(crate) fn value(&self) -> &f32 {
         &self.value
     }
+    pub(crate) fn calc_range(&self, level: &PriceLevel) -> f32 {
+        let mut range = self.value - level.value();
+        range = if range < 0.0 { -range } else { range };
+        range
+    }
+    pub(crate) fn calc_size_as_unit(&self,amount : &Amount)->Unit{
+        let size_as_f32 = self.value * amount.value();
+        self.value_type_as_unit.create_unit(size_as_f32)
+    }
 }
-
+#[derive(Debug, Clone, PartialEq)]
 pub struct CommonDateTime(pub(crate) DateTime<Utc>);
 impl CommonDateTime {
     pub(crate) fn now() -> CommonDateTime {
@@ -86,9 +99,8 @@ pub(crate) struct Amount {
 }
 impl Amount {
     pub(crate) fn new(value: f32, asset_id: &AssetId) -> Self {
-        
-        let id :AssetId = asset_id.clone();
-        
+        let id: AssetId = asset_id.clone();
+
         Amount {
             value: value,
             asset_id: id,
@@ -127,12 +139,7 @@ impl Amount {
             AmountTypeErrors::DifferentAmountOfEntityCanNotBeRemove.message()
         )
     }
-    pub(crate) fn to_immutable(self) -> Amount {
-        Amount {
-            value: self.value,
-            asset_id: self.asset_id,
-        }
-    }
+    
 }
 pub(crate) struct AssetName(pub(crate) String);
 

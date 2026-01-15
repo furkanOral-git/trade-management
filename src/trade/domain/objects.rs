@@ -32,20 +32,20 @@ pub(crate) struct PositionStatus {
     status_risk: Unit,
     status_size: PositionSize,
 }
-impl PositionStatus{
-    pub(crate) fn get_status_level(&self) ->&PriceLevel{
+impl PositionStatus {
+    pub(crate) fn get_status_level(&self) -> &PriceLevel {
         &self.status_level
     }
-    pub(crate) fn get_status_amount(&self)->&Amount{
+    pub(crate) fn get_status_amount(&self) -> &Amount {
         &self.status_amount
-    } 
-    pub(crate) fn get_status_stop(&self)->&PriceLevel{
+    }
+    pub(crate) fn get_status_stop(&self) -> &PriceLevel {
         &self.status_stop
     }
-    pub(crate) fn get_status_risk(&self)->&Unit{
+    pub(crate) fn get_status_risk(&self) -> &Unit {
         &self.status_risk
     }
-    pub(crate) fn get_status_size(&self)->&PositionSize{
+    pub(crate) fn get_status_size(&self) -> &PositionSize {
         &self.status_size
     }
 }
@@ -56,17 +56,14 @@ impl PositionStatus {
         status_risk: Unit,
         asset_id: AssetId,
     ) -> Self {
-        let mut entry_stop_distance = status_level.value() - status_stop_level.value();
-        if entry_stop_distance < 0.0 {
-            entry_stop_distance *= -1.0;
-        }
+
+        let entry_stop_distance = status_level.calc_range(&status_stop_level);
         // amount(belirsiz olan X dedik) * steps(belli olan) = risk_as_unit
         //risk_as_unit / steps = amount
         let amount_as_f32 = *status_risk.value() / entry_stop_distance;
         let amount = Amount::new(amount_as_f32, &asset_id);
-        
-        let size_as_f32: f32 = amount.value() * status_level.value();
-        let size_as_unit: Unit = status_risk.unit_type().create_unit(size_as_f32);
+
+        let size_as_unit = status_level.calc_size_as_unit(&amount);
         let size: PositionSize = PositionSize(size_as_unit);
 
         PositionStatus {
