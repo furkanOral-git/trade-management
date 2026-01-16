@@ -1,7 +1,7 @@
 use crate::{
     shared::{
         ids::{PositionId, SessionId},
-        objects::{Unpersisted, amount::Amount, price::PriceLevel},
+        objects::{Unpersisted, asset::*},
     },
     trade::domain::{entities::trade::TradeLog, objects::trade::TradeAction},
 };
@@ -11,8 +11,8 @@ impl TradeLogFactory {
     pub(crate) fn new_unbounded(
         session_id: SessionId,
         action: TradeAction,
-        at_level: PriceLevel,
-        amount: Amount,
+        at_level: AssetPriceLevel,
+        amount: AssetAmount,
     ) -> TradeLog<Unpersisted> {
         todo!()
     }
@@ -20,8 +20,8 @@ impl TradeLogFactory {
         position_id: PositionId,
         session_id: SessionId,
         action: TradeAction,
-        at_level: PriceLevel,
-        amount: Amount,
+        at_level: AssetPriceLevel,
+        amount: AssetAmount,
     ) -> TradeLog<Unpersisted> {
         todo!()
     }

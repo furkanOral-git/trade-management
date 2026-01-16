@@ -1,21 +1,21 @@
-use crate::shared::{ids::AssetId, objects::{amount::Amount, price::PriceLevel, unit::Unit}};
+use crate::shared::{ids::AssetId, objects::{asset::*, unit::Unit}};
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct PositionStatus {
-    status_level: PriceLevel,
-    status_amount: Amount,
-    status_stop: PriceLevel,
+    status_level: AssetPriceLevel,
+    status_amount: AssetAmount,
+    status_stop: AssetPriceLevel,
     status_risk: Unit,
     status_size: PositionSize,
 }
 impl PositionStatus {
-    pub(crate) fn get_status_level(&self) -> &PriceLevel {
+    pub(crate) fn get_status_level(&self) -> &AssetPriceLevel {
         &self.status_level
     }
-    pub(crate) fn get_status_amount(&self) -> &Amount {
+    pub(crate) fn get_status_amount(&self) -> &AssetAmount {
         &self.status_amount
     }
-    pub(crate) fn get_status_stop(&self) -> &PriceLevel {
+    pub(crate) fn get_status_stop(&self) -> &AssetPriceLevel {
         &self.status_stop
     }
     pub(crate) fn get_status_risk(&self) -> &Unit {
@@ -27,8 +27,8 @@ impl PositionStatus {
 }
 impl PositionStatus {
     pub(crate) fn new(
-        status_level: PriceLevel,
-        status_stop_level: PriceLevel,
+        status_level: AssetPriceLevel,
+        status_stop_level: AssetPriceLevel,
         status_risk: Unit,
         asset_id: AssetId,
     ) -> Self {
@@ -37,7 +37,7 @@ impl PositionStatus {
         // amount(belirsiz olan X dedik) * steps(belli olan) = risk_as_unit
         //risk_as_unit / steps = amount
         let amount_as_f32 = *status_risk.value() / entry_stop_distance;
-        let amount = Amount::new(amount_as_f32, &asset_id);
+        let amount = AssetAmount::new(amount_as_f32, &asset_id);
 
         let size_as_unit = status_level.calc_size_as_unit(&amount);
         let size: PositionSize = PositionSize(size_as_unit);

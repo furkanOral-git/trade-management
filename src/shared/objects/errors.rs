@@ -20,17 +20,17 @@ impl DomainError for UnitTypeErrors {
 }
 impl_display_trait!(UnitTypeErrors);
 #[derive(Debug)]
-pub enum AmountTypeErrors {
-    DifferentAmountOfEntityCanNotBeAdd,
-    DifferentAmountOfEntityCanNotBeRemove,
+pub enum AssetAmountTypeError {
+    DifferentAmountOfAssetsCanNotBeAdd,
+    DifferentAmountOfAssetsCanNotBeRemove,
 }
-impl DomainError for AmountTypeErrors {
+impl DomainError for AssetAmountTypeError {
     
     fn message(&self) -> &str {
         match self {
-            AmountTypeErrors::DifferentAmountOfEntityCanNotBeAdd => "AmountTypeError : Different amount of entity types can not be add each other!",
-            AmountTypeErrors::DifferentAmountOfEntityCanNotBeRemove => "AmountTypeError : Different amount of entity type can not be remove from this!",
+            AssetAmountTypeError::DifferentAmountOfAssetsCanNotBeAdd => "AmountTypeError : Different amount of entity types can not be add each other!",
+            AssetAmountTypeError::DifferentAmountOfAssetsCanNotBeRemove => "AmountTypeError : Different amount of entity type can not be remove from this!",
         }
     }
 }
-impl_display_trait!(AmountTypeErrors);
+impl_display_trait!(AssetAmountTypeError);
