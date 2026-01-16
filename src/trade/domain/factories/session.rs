@@ -1,19 +1,12 @@
 use std::marker::PhantomData;
 
-use rumt::{emit_event, prelude::RuntimeEvent};
-
 use crate::{
     shared::{
-        event::SessionCreatedEvent,
-        ids::{PositionId, SessionId},
-        objects::{Amount, CommonDateTime, PriceLevel, Unit},
-        states::{OpenClosedState, Persisted, Unpersisted},
+        ids::SessionId,
+        objects::{common::CommonDateTime, unit::Unit, *},
     },
     trade::domain::{
-        TradeSession,
-        entity::{SessionAsset, TradeLog},
-        objects::{PositionType, TradeAction, TradeType},
-        states::TradePositionPersistable,
+        TradeSession, entities::asset::SessionAsset, states::TradePositionPersistable,
     },
 };
 
@@ -62,26 +55,3 @@ impl TradeSessionFactory {
         }
     }
 }
-pub(crate) struct TradeLogFactory;
-impl TradeLogFactory {
-    pub(crate) fn new_unbounded(
-        session_id: SessionId,
-        action: TradeAction,
-        at_level: PriceLevel,
-        amount: Amount,
-    ) -> TradeLog<Unpersisted> {
-        todo!()
-    }
-    pub(crate) fn new_bounded(
-        position_id: PositionId,
-        session_id: SessionId,
-        action: TradeAction,
-        at_level: PriceLevel,
-        amount: Amount,
-    ) -> TradeLog<Unpersisted> {
-        todo!()
-    }
-}
-
-pub(crate) struct TradePositionFactory;
-impl TradePositionFactory {}

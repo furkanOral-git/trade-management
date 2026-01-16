@@ -2,24 +2,16 @@ use std::marker::PhantomData;
 
 use crate::{
     shared::{
-        ids::*,
-        objects::{Amount, AssetName, CommonDateTime, Description, PriceLevel, Unit},
-        states::{OpenClosedState, Persistency, Unpersisted},
+        ids::{PositionId, SessionId},
+        objects::{common::CommonDateTime, unit::Unit, *},
     },
-    trade::domain::{objects::*, states::TradeLogPersistable},
+    trade::domain::{
+        entities::{asset::SessionAsset, trade::TradeLog},
+        objects::position::{PositionStatus, PositionType},
+        states::TradeLogPersistable,
+    },
 };
 
-pub(crate) struct TradeLog<State: Persistency> {
-    position_id: PositionId,
-    session_id : SessionId,
-    trade_type: TradeType,
-    action: TradeAction,
-    level: PriceLevel,
-    amount: Amount,
-    date_time: CommonDateTime,
-    description: Description,
-    _state: PhantomData<State>,
-}
 pub(crate) struct TradePosition<State: Persistency> {
     id: PositionId,
     session_id: SessionId,
@@ -52,16 +44,4 @@ pub(crate) struct ClosedTradePosition<State: Persistency> {
     closed_time: CommonDateTime,
     total_pnl: Unit,
     _state: PhantomData<State>,
-}
-pub(crate) struct SessionAsset {
-    id: AssetId,
-    name: AssetName,
-}
-impl SessionAsset {
-    pub(crate) fn new(id: AssetId, name: AssetName) -> Self {
-        SessionAsset { id, name }
-    }
-    pub(crate) fn create_amount(&self, value: f32) -> Amount {
-        Amount::new(value, &self.id)
-    }
 }

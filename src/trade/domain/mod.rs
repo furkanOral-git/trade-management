@@ -4,19 +4,10 @@ use std::{fmt::Error, marker::PhantomData};
 
 use rumt::{emit_event, prelude::RuntimeEvent};
 
-use crate::{
-    shared::{
-        event::SessionCreatedEvent,
-        ids::*,
-        objects::{Amount, CommonDateTime, PriceLevel, Unit},
-        states::{OpenClosedState, Persisted, Persistency, Unpersisted}, traits::DomainError,
-    },
-    trade::domain::{
-        entity::{ClosedTradePosition, SessionAsset, TradeLog, TradePosition}, errors::{TradePositionDomainError, TradeSessionDomainError}, factories::{TradeLogFactory, TradeSessionFactory}, objects::{PositionType, TradeType}, states::TradePositionPersistable
-    },
-};
+use crate::{shared::{events::SessionCreatedEvent, ids::{PositionId, SessionId}, objects::{OpenClosedState, Persistency, Unpersisted, amount::Amount, common::CommonDateTime, price::PriceLevel, unit::Unit}}, trade::domain::{entities::{asset::SessionAsset, position::TradePosition}, errors::{TradePositionDomainError, TradeSessionDomainError}, factories::{session::TradeSessionFactory, trade::TradeLogFactory}, objects::position::PositionType, states::TradePositionPersistable}};
 
-pub mod entity;
+
+pub mod entities;
 pub mod objects;
 pub mod states;
 pub mod errors;
@@ -70,7 +61,7 @@ impl<State: Persistency> TradeSession<State> {
             let err = TradeSessionDomainError::ClosedTradeSessionCanNotOpenPosition;
             return Err(err)
         }
-        let log = TradeLogFactory::new_unbounded(self.id);
+        //let log = TradeLogFactory::new_unbounded(self.id);
         todo!()
 
     }

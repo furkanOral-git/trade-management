@@ -1,29 +1,5 @@
-#![allow(unused)]
-use std::marker::PhantomData;
+use crate::shared::{ids::AssetId, objects::{amount::Amount, price::PriceLevel, unit::Unit}};
 
-use crate::shared::{
-    enums::UnitType,
-    ids::AssetId,
-    objects::{Amount, CommonDateTime, PriceLevel, Unit},
-    traits::ValueObject,
-};
-#[derive(Debug, PartialEq, Clone)]
-pub(crate) enum PositionType {
-    Long,
-    Short,
-}
-#[derive(Debug, PartialEq, Clone)]
-pub(crate) enum TradeType {
-    Buy,
-    Sell,
-}
-#[derive(Debug, PartialEq, Clone)]
-pub(crate) enum TradeAction {
-    PartialClose,
-    FullClose,
-    AddSize,
-    Initial,
-}
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct PositionStatus {
     status_level: PriceLevel,
@@ -84,4 +60,9 @@ impl PositionSize {
     pub(crate) fn get_value(&self) -> &Unit {
         &self.0
     }
+}
+#[derive(Debug, PartialEq, Clone)]
+pub(crate) enum PositionType {
+    Long,
+    Short,
 }
