@@ -6,20 +6,21 @@ use crate::{
         objects::{common::CommonDateTime, unit::Unit, *},
     },
     trade::domain::{
-        TradeSession, entities::asset::SessionAsset, states::TradePositionPersistable,
+         BaseTradeSession, entities::asset::SessionAsset, states::{TradePosition, TradeSession}
     },
 };
 
 pub(crate) struct TradeSessionFactory;
 
 impl TradeSessionFactory {
-    pub(crate) fn create_new(
+    pub(crate) fn create_base(
         name: impl Into<String>,
         white_list: impl Into<Vec<SessionAsset>>,
         capital: Unit,
-    ) -> TradeSession<Unpersisted> {
+    ) -> BaseTradeSession<Unpersisted> {
+        
         let open_time = CommonDateTime::now();
-        let session = TradeSession {
+        let session = BaseTradeSession {
             id: SessionId(0),
             name: name.into(),
             open_time: open_time,
@@ -39,10 +40,10 @@ impl TradeSessionFactory {
         state: OpenClosedState,
         capital: Unit,
         closed_time: Option<CommonDateTime>,
-        positions: impl Into<Vec<TradePositionPersistable>>,
+        positions: impl Into<Vec<TradePosition>>,
         white_list: impl Into<Vec<SessionAsset>>,
-    ) -> TradeSession<Persisted> {
-        TradeSession {
+    ) -> TradeSession {
+        let session = BaseTradeSession {
             id: id,
             name: name.into(),
             open_time: open_time,
@@ -52,6 +53,7 @@ impl TradeSessionFactory {
             positions: positions.into(),
             white_list: white_list.into(),
             _state: PhantomData,
-        }
+        };
+        TradeSession::Persisted(session)
     }
 }

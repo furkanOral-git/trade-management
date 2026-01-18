@@ -3,7 +3,7 @@ use crate::{
         ids::{PositionId, SessionId},
         objects::{Unpersisted, asset::*},
     },
-    trade::domain::{entities::trade::TradeLog, objects::trade::TradeAction},
+    trade::domain::{ entities::trade::BaseTradeLog, objects::trade::*},
 };
 
 pub(crate) struct TradeLogFactory;
@@ -13,7 +13,8 @@ impl TradeLogFactory {
         action: TradeAction,
         at_level: AssetPriceLevel,
         amount: AssetAmount,
-    ) -> TradeLog<Unpersisted> {
+        trade_type : TradeType,
+    ) -> BaseTradeLog<Unpersisted> {
         todo!()
     }
     pub(crate) fn new_bounded(
@@ -22,7 +23,8 @@ impl TradeLogFactory {
         action: TradeAction,
         at_level: AssetPriceLevel,
         amount: AssetAmount,
-    ) -> TradeLog<Unpersisted> {
+        trade_type : TradeType
+    ) -> BaseTradeLog<Unpersisted> {
         todo!()
     }
 }

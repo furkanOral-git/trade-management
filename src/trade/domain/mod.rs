@@ -7,17 +7,17 @@ use rumt::{emit_event, prelude::RuntimeEvent};
 use crate::{
     shared::{
         events::SessionCreatedEvent,
-        ids::{PositionId, SessionId},
+        ids::{AssetId, PositionId, SessionId},
         objects::{
             OpenClosedState, Persistency, Unpersisted, asset::*, common::CommonDateTime, unit::Unit,
         },
     },
     trade::domain::{
-        entities::{asset::SessionAsset, position::TradePosition},
+        entities::{asset::SessionAsset, position::BaseTradePosition},
         errors::{TradePositionDomainError, TradeSessionDomainError},
         factories::{session::TradeSessionFactory, trade::TradeLogFactory},
-        objects::position::PositionType,
-        states::TradePositionPersistable,
+        objects::{position::PositionType, trade::*}, states::TradePosition,
+        
     },
 };
 
@@ -27,25 +27,25 @@ pub mod factories;
 pub mod objects;
 pub mod states;
 
-pub(crate) struct TradeSession<State: Persistency> {
+pub(crate) struct BaseTradeSession<State: Persistency> {
     id: SessionId,
     name: String,
     open_time: CommonDateTime,
     state: OpenClosedState,
     capital: Unit,
     closed_time: Option<CommonDateTime>,
-    positions: Vec<TradePositionPersistable>,
+    positions: Vec<TradePosition>,
     white_list: Vec<SessionAsset>,
     _state: PhantomData<State>,
 }
 
-impl<State: Persistency> TradeSession<State> {
+impl<State: Persistency> BaseTradeSession<State> {
     pub(crate) async fn open_new_session(
         name: &str,
         list: Vec<SessionAsset>,
         capital: Unit,
-    ) -> TradeSession<Unpersisted> {
-        let session = TradeSessionFactory::create_new(name, list, capital);
+    ) -> BaseTradeSession<Unpersisted> {
+        let session = TradeSessionFactory::create_base(name, list, capital);
 
         let event_arg = SessionCreatedEvent {
             name: session.name.clone(),
@@ -58,30 +58,12 @@ impl<State: Persistency> TradeSession<State> {
         emit_event(event, event_arg).await;
         session
     }
-    // Aggregate'in methodları içerisine yalnızca VO'lar gelebilir. Entity'ler parametre olarak gelemez.
-    // Çünkü Application katmanının sınırları ihlal edilmiş olur. Application sadece uygulama katındaki loglama, cachleme, repo, exception handling gibi
-    // ya da dış servislerin implementasyonu için kullanılır. Application yalnızca AR ya da Birden fazla AR'ı bir arada çalıştıran Domain Service kullanabilir.
-    // Entity'i application katmanında oluşturmak bu sınırı ihlal eder ve DDD yapısı bozulur.
-
-    pub(crate) fn open_new_position(
-        &mut self,
-        direction: PositionType,
-        at_level: AssetPriceLevel,
-        stop_level: AssetPriceLevel,
-        risk: Unit,
-    ) -> Result<TradePosition<Unpersisted>, TradeSessionDomainError> {
-        if self.state == OpenClosedState::Closed {
-            let err = TradeSessionDomainError::ClosedTradeSessionCanNotOpenPosition;
-            return Err(err);
-        }
-        //let log = TradeLogFactory::new_unbounded(self.id);
-        todo!()
-    }
+    
     pub(crate) fn close_position(
         &mut self,
         position_id: PositionId,
         at_level: AssetPriceLevel,
-    ) -> Result<TradeSession<Unpersisted>, TradePositionDomainError> {
+    ) -> Result<BaseTradeSession<Unpersisted>, TradePositionDomainError> {
         todo!()
     }
     pub(crate) fn close_position_partial(
@@ -89,10 +71,11 @@ impl<State: Persistency> TradeSession<State> {
         position_id: PositionId,
         at_level: AssetPriceLevel,
         amount: AssetAmount,
-    ) -> TradeSession<Unpersisted> {
+    ) -> Result<BaseTradeSession<Unpersisted>, TradePositionDomainError> {
         todo!()
     }
-    pub(crate) fn close_session(&mut self) -> TradeSession<Unpersisted> {
+    pub(crate) fn close_session(&mut self) -> BaseTradeSession<Unpersisted> {
         todo!()
     }
 }
+

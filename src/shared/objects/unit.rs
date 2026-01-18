@@ -1,51 +1,51 @@
+use std::sync::Arc;
+
 use crate::shared::{objects::errors::UnitTypeErrors, traits::DomainError};
 
 #[derive(Debug, PartialEq, Clone)]
-pub(crate) enum UnitType {
+pub(crate) enum Currency {
     USD,
     USDT,
     USDC,
     TL,
 }
-impl UnitType {
+impl Currency {
     pub(crate) fn stringfy(&self) -> String {
         match self {
-            UnitType::USD => "$".into(),
-            UnitType::USDT => "₮".into(),
-            UnitType::USDC => "USDC".into(),
-            UnitType::TL => "₺".into(),
+            Currency::USD => "$".into(),
+            Currency::USDT => "₮".into(),
+            Currency::USDC => "USDC".into(),
+            Currency::TL => "₺".into(),
         }
     }
-    pub(crate) fn create_unit(&self, value: f32) -> Unit {
-        Unit::new(self, value)
-    }
-    
 }
 #[derive(Debug, PartialEq, Clone)]
 pub struct Unit {
     value: f32,
-    unit_type: UnitType,
+    currency: Arc<Currency>,
 }
 impl Unit {
-    pub(crate) fn new(unit_type: &UnitType, value: f32) -> Self {
+    pub(crate) fn new(currency: Arc<Currency>, value: f32) -> Self {
+        
         Unit {
             value,
-            unit_type: unit_type.clone(),
+            currency: currency,
         }
     }
     pub(crate) fn value(&self) -> &f32 {
         &self.value
     }
-    pub(crate) fn unit_type(&self) -> &UnitType {
-        &self.unit_type
+    pub(crate) fn currency(&self) -> &Currency {
+        &self.currency
     }
 }
 impl Unit {
     pub(crate) fn add_unit(self, unit: &Unit) -> Unit {
-        if unit.unit_type == self.unit_type {
+        
+        if unit.currency == self.currency {
             return Unit {
                 value: self.value + unit.value,
-                unit_type: self.unit_type.clone(),
+                currency: self.currency,
             };
         }
 
@@ -55,10 +55,10 @@ impl Unit {
         )
     }
     pub(crate) fn remove_unit(self, unit: &Unit) -> Unit {
-        if unit.unit_type == self.unit_type {
+        if unit.currency == self.currency {
             return Unit {
                 value: self.value - unit.value,
-                unit_type: self.unit_type.clone(),
+                currency: self.currency,
             };
         }
         panic!(
@@ -66,7 +66,7 @@ impl Unit {
             UnitTypeErrors::DifferentUnitTypesCanNotBeRemove.message()
         )
     }
-    pub(crate) fn as_string(&mut self) -> String {
-        format!("{} {}", self.value, self.unit_type.stringfy())
+    pub(crate) fn as_string(&self) -> String {
+        format!("{} {}", self.value, self.currency.stringfy())
     }
 }

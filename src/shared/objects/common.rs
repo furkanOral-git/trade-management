@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct CommonDateTime(pub(crate) DateTime<Utc>);
 impl CommonDateTime {
@@ -7,7 +6,13 @@ impl CommonDateTime {
         CommonDateTime(Utc::now())
     }
 }
-
-
-
-pub(crate) struct Description(pub(crate) String);
+#[derive(Debug, Clone)]
+pub(crate) struct Description(String);
+impl Description {
+    pub(crate) fn new(value: impl Into<String>) -> Self {
+        Description(value.into())
+    }
+    pub(crate) fn value(&self) -> &String {
+        &self.0
+    }
+}

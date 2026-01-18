@@ -1,14 +1,22 @@
-use crate::{shared::objects::{Persisted, Unpersisted}, trade::domain::{TradeSession, entities::{position::TradePosition, trade::TradeLog}}};
-pub(crate) enum TradeSessionPersistable{
-    Persisted(TradeSession<Persisted>),
-    Unpersisted(TradeSession<Unpersisted>)
+use crate::{
+    shared::objects::{Persisted, Unpersisted},
+    trade::domain::{BaseTradeSession, entities::{
+        position::{BaseTradePosition, ClosedTradePosition},
+        trade::{BaseTradeLog},
+    }},
+};
+pub(crate) enum TradeSession {
+    Persisted(BaseTradeSession<Persisted>),
+    Unpersisted(BaseTradeSession<Unpersisted>),
 }
-pub(crate) enum TradePositionPersistable {
-    Persisted(TradePosition<Persisted>),
-    Unpersisted(TradePosition<Unpersisted>),
+pub(crate) enum TradePosition {
+    Persisted(BaseTradePosition<Persisted>),
+    Unpersisted(BaseTradePosition<Unpersisted>),
+    PersistedClosed(ClosedTradePosition<Persisted>),
+    UnpersistedClosed(ClosedTradePosition<Unpersisted>),
 }
 
-pub(crate) enum TradeLogPersistable{
-    Persisted(TradeLog<Persisted>),
-    Unpersisted(TradeLog<Unpersisted>),
+pub(crate) enum TradeLog {
+    Persisted(BaseTradeLog<Persisted>),
+    Unpersisted(BaseTradeLog<Unpersisted>),
 }

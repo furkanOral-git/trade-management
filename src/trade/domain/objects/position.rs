@@ -1,66 +1,43 @@
-use crate::shared::{ids::AssetId, objects::{asset::*, unit::Unit}};
+use crate::shared::{
+    ids::AssetId,
+    objects::{asset::*, unit::Unit},
+};
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct PositionStatus {
-    status_level: AssetPriceLevel,
+    status_cost_level: AssetPriceLevel,
     status_amount: AssetAmount,
     status_stop: AssetPriceLevel,
     status_risk: Unit,
-    status_size: PositionSize,
+    status_size: Unit,
 }
+
 impl PositionStatus {
-    pub(crate) fn get_status_level(&self) -> &AssetPriceLevel {
-        &self.status_level
-    }
-    pub(crate) fn get_status_amount(&self) -> &AssetAmount {
-        &self.status_amount
-    }
-    pub(crate) fn get_status_stop(&self) -> &AssetPriceLevel {
-        &self.status_stop
-    }
-    pub(crate) fn get_status_risk(&self) -> &Unit {
-        &self.status_risk
-    }
-    pub(crate) fn get_status_size(&self) -> &PositionSize {
-        &self.status_size
-    }
-}
-impl PositionStatus {
-    pub(crate) fn new(
-        status_level: AssetPriceLevel,
-        status_stop_level: AssetPriceLevel,
-        status_risk: Unit,
-        asset_id: AssetId,
+    pub(crate) fn create_status(
+        cost_level: AssetPriceLevel,
+        stop_level: AssetPriceLevel,
+        risk: Unit,
     ) -> Self {
+        let range = cost_level.calc_range(&stop_level);
+        //amount (x) * range = risk
+        // risk / range = amount
+        let amount: AssetAmount =
+            AssetAmount::new(risk.value() / range.value(), cost_level.asset_id().clone());
 
-        let entry_stop_distance = status_level.calc_range(&status_stop_level);
-        // amount(belirsiz olan X dedik) * steps(belli olan) = risk_as_unit
-        //risk_as_unit / steps = amount
-        let amount_as_f32 = *status_risk.value() / entry_stop_distance;
-        let amount = AssetAmount::new(amount_as_f32, &asset_id);
-
-        let size_as_unit = status_level.calc_size_as_unit(&amount);
-        let size: PositionSize = PositionSize(size_as_unit);
+        // size = cost_level * amount
+        let size_as_f32 = cost_level.value() * amount.value();
+        let size = Unit::new(cost_level.currency().clone(), size_as_f32);
 
         PositionStatus {
-            status_level: status_level,
+            status_cost_level: cost_level,
             status_amount: amount,
-            status_stop: status_stop_level,
-            status_risk: status_risk,
+            status_stop: stop_level,
+            status_risk: risk,
             status_size: size,
         }
     }
-    pub(crate) fn update_with_self(self) -> Self {
-        todo!()
-    }
 }
-#[derive(Debug, PartialEq, Clone)]
-pub(crate) struct PositionSize(Unit);
-impl PositionSize {
-    pub(crate) fn get_value(&self) -> &Unit {
-        &self.0
-    }
-}
+
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) enum PositionType {
     Long,
