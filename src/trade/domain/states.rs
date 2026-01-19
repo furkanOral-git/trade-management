@@ -1,7 +1,7 @@
 use crate::{
     shared::objects::{Persisted, Unpersisted},
     trade::domain::{BaseTradeSession, entities::{
-        position::{BaseTradePosition, ClosedTradePosition},
+        position::{BaseTradePosition},
         trade::{BaseTradeLog},
     }},
 };
@@ -12,11 +12,17 @@ pub(crate) enum TradeSession {
 pub(crate) enum TradePosition {
     Persisted(BaseTradePosition<Persisted>),
     Unpersisted(BaseTradePosition<Unpersisted>),
-    PersistedClosed(ClosedTradePosition<Persisted>),
-    UnpersistedClosed(ClosedTradePosition<Unpersisted>),
 }
 
 pub(crate) enum TradeLog {
     Persisted(BaseTradeLog<Persisted>),
     Unpersisted(BaseTradeLog<Unpersisted>),
+}
+impl TradeLog{
+    pub(crate) fn is_persisted(&self)->bool{
+        match self {
+            TradeLog::Persisted(base_trade_log) => true,
+            TradeLog::Unpersisted(base_trade_log) => false,
+        }
+    }
 }
