@@ -34,6 +34,9 @@ impl<State: Persistency> BaseTradePosition<State> {
     ) -> BaseTradePosition<Unpersisted> {
         todo!()
     }
+    pub(crate) fn is_open(&self)->bool{
+        self.closing_date == None
+    }
 }
 impl BaseTradePosition<Unpersisted> {
     ///usize : The end of the vector is assumed to be a starting index of 0, and 0 represents the last element of logs.
